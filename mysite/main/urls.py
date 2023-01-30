@@ -14,5 +14,10 @@ urlpatterns = [
     path('registration', views.CustomRegistrationView.as_view()),
 
     # path('logout/', name='logout'),
+
+    # API URLS
+    path('get_users', views.get_users),
+    path('registration_mobile', views.registration_mobile),
+
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

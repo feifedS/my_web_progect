@@ -3,6 +3,10 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import resolve_url
 from django.views.generic import CreateView
 from main.models import CustomUser
+from django.http import JsonResponse
+from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
 def index(request):
@@ -50,8 +54,26 @@ class CustomRegistrationView(CreateView):
             age = request.POST.get("age"),
             first_name = request.POST.get("first_name"),
             last_name = request.POST.get("last_name"),
-            gender =request.POST.get("gender"),
+            gender_id = 1,
             phone_number = request.POST.get("phone_number"),
         )
 
         return render(request, "main/registration_success.html")
+
+def get_users(request):
+    users = CustomUser.objects.all()
+
+    print(users)
+
+    users = serializers.serialize('json', users)
+
+    return JsonResponse(users, safe=False)
+
+@csrf_exempt
+def registration_mobile(request):
+    print(request.POST.get("first_name"))
+    print(request.POST.get("last_name"))
+    print(request.POST.get("login"))
+    print(request.POST.get("password"))
+
+    return JsonResponse({"status": "ok"}, safe=False)
