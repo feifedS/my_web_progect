@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import resolve_url
 from django.views.generic import CreateView
 from main.models import CustomUser
@@ -29,6 +29,13 @@ class CustomLoginView(LoginView):
 
     def get_success_url(self):
         return resolve_url('index')
+
+
+class CustomLogoutView(LogoutView):
+    template_name = 'main/logout.html'
+
+    def get_success_url(self):
+        return resolve_url('logout')
 
 
 class CustomRegistrationView(CreateView):
@@ -77,3 +84,6 @@ def registration_mobile(request):
     print(request.POST.get("password"))
 
     return JsonResponse({"status": "ok"}, safe=False)
+
+
+
