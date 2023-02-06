@@ -2,6 +2,7 @@
 {% comment %} {% block title %} {% endblock  %} {% endcomment %}
 {% block content %}
 <link rel="stylesheet" href="/static/css/registration.css"/>
+<link rel="stylesheet" href="/static/css/psw_val.css"/>
 <section class="vh-100 gradient-custom">
     <div class="container py-5 h-100">
       <div class="row justify-content-center align-items-center h-100">
@@ -9,21 +10,30 @@
           <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
             <div class="card-body p-4 p-md-5">
               <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Registration Form</h3>
-              <form action="/main/registration" method="POST">
+              <form action="/main/registration" method="POST" id='registration'>
                 {% csrf_token %}
                 <div class="row">
                   <div class="col-md-6 mb-4">
-  
                     <div class="form-outline">
-                      <input type="text" name="first_name" id="firstName" class="form-control form-control-lg" />
+                      <input type="text" name="username" id="username" class="form-control form-control-lg" onkeyup="if (/[^|a-z0-9]+/g.test(this.value)) this.value = this.value.replace(/[^|a-z0-9]+/g,'')"  title="Введите ваш логин" />
+                      <label class="form-label" for="username">UserName</label>
+                    </div>
+                    
+                  </div>
+                  <div class="w-100"></div>
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <input type="text" name="first_name" id="firstName" class="form-control form-control-lg" title="Введите ваше имя "/>
+                      <span id="Errorfirst_name"></span>
                       <label class="form-label" for="firstName">First Name</label>
                     </div>
+                  
   
                   </div>
                   <div class="col-md-6 mb-4">
   
                     <div class="form-outline">
-                      <input type="text" name="last_name" id="lastName" class="form-control form-control-lg" />
+                      <input type="text" name="last_name" id="lastName" class="form-control form-control-lg" title="Введите ваше фамилие"/>
                       <label class="form-label" for="lastName">Last Name</label>
                     </div>
   
@@ -31,29 +41,27 @@
                   <div class="col-md-6 mb-4">
   
                     <div class="form-outline">
-                      <input type="text" name="username" id="lastName" class="form-control form-control-lg" />
-                      <label class="form-label" for="lastName">UserName</label>
+                      <input type="text" name="password1" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов."  />
+                      <label class="form-label" for="psw">Password</label>
                     </div>
   
                   </div>
                   <div class="col-md-6 mb-4">
   
                     <div class="form-outline">
-                      <input type="text" name="password1" id="lastName" class="form-control form-control-lg" />
-                      <label class="form-label" for="lastName">Password</label>
+                      <input type="text" name="password2" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов." />
+                      <label class="form-label" for="psw">Confirm password</label>
                     </div>
-  
-                  </div>
-                  <div class="col-md-6 mb-4">
-  
-                    <div class="form-outline">
-                      <input type="text" name="password2" id="lastName" class="form-control form-control-lg" />
-                      <label class="form-label" for="lastName">Confirm password</label>
-                    </div>
-  
+
                   </div>
                 </div>
-  
+                <div id="message">
+                  <h3>Password must contain the following:</h3>
+                  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+                  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+                  <p id="number" class="invalid">A <b>number</b></p>
+                  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+                </div>
                 <div class="row">
                   <div class="col-md-6 mb-4 d-flex align-items-center">
   
@@ -98,15 +106,22 @@
   
                   </div>
                   <div class="col-md-6 mb-4 pb-2">
-  
+
+                    
                     <div class="form-outline">
-                      <input type="tel" id="phoneNumber" name="phone_number" class="form-control form-control-lg" />
+                      <input type="tel" id="phoneNumber" name="phone_number" class="form-control form-control-lg" maxlength="15"   title="Enter 11 digit mobile number" placeholder="8(xxx)xxx-xx-xx"  />
                       <label class="form-label" for="phoneNumber">Phone Number</label>
                     </div>
-  
+                    
                   </div>
                 </div>
-  
+                <div>
+                  <input type="tel" id="numberonly" pattern="\d" maxlength="15">
+                </div>
+                <label for="tel">Telephone</label>
+                <input type="tel" id="telle" maxlength="15">
+
+                
                 {% comment %} <div class="row">
                   <div class="col-12">
                     <select class="select form-control-lg">

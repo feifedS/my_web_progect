@@ -12,10 +12,14 @@ urlpatterns = [
     # path('login', views.login),
     # path('registration', views.registration),
     path('login', views.CustomLoginView.as_view(), name='login'),
-    path('registration', views.CustomRegistrationView.as_view()),
+    path('registration', views.CustomRegistrationView.as_view(),),
     # path('login', auth_views.LoginView.as_view(template_name='/login.html'), name='login'),
     path('logout', views.CustomLogoutView.as_view(),name='logout'),
     path('get_users', views.get_users),
     path('registration_mobile', views.registration_mobile),
+    path('registration_copy', views.registration_copy, name='registration_copy'),
+    path("service",views.service, name='service'),
+
+    path('checkusername', views.check_username, name='check_username'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import resolve_url
 from django.views.generic import CreateView
@@ -6,8 +7,8 @@ from main.models import CustomUser
 from django.http import JsonResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
-
-
+from django.contrib import messages 
+from django.contrib.auth.models import User 
 # Create your views here.
 def index(request):
     print("HELLO")
@@ -22,6 +23,21 @@ def registration(request):
     print("HELLO")
 
     return render(request, 'main/registration.html')
+def registration_copy(request):
+    print("HELLO")
+    if request.method =="POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid(): 
+                form.save() 
+                # messages.success(request, 'Account created successfully') 
+        else: 
+                form = UserCreationForm() 
+        context = { 
+            'form':form 
+        } 
+    return render(request, 'main/registration_copy.html')
+
+
 
 
 class CustomLoginView(LoginView):
@@ -48,7 +64,11 @@ class CustomRegistrationView(CreateView):
     def post(self, request):
         new_user = CustomUser()
         password = ""
-
+        # if username==request.POST.get("username"):
+        #     return render(request, "main/registration.html")
+        # if User.objects.filter(username = 'username').first():
+        #     messages.error(request, "This username is already taken")
+        #     return render(request, "main/registration.html")
         if request.POST.get("password1") != request.POST.get("password2"):
             return render(request, "main/registration.html")
         else:
@@ -56,6 +76,7 @@ class CustomRegistrationView(CreateView):
 
         CustomUser.objects.create_user(
             username = request.POST.get("username"),
+    
             password = password,
             email = request.POST.get("email"),
             age = request.POST.get("age"),
@@ -85,5 +106,11 @@ def registration_mobile(request):
 
     return JsonResponse({"status": "ok"}, safe=False)
 
+@csrf_exempt
+def check_username(request):
+    print("FROM CLIENT: ", request.GET.get("checkUsername"))
 
+    return JsonResponse({'exists': True})
 
+def service(request):
+    return render(request,'main/service.html')

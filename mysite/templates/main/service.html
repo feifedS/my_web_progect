@@ -1,0 +1,146 @@
+{%  extends 'layout.html' %}
+{% comment %} {% block title %} {% endblock  %} {% endcomment %}
+{% block content %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">    
+<link rel="stylesheet" href="/static/css/registration.css"/>
+<link rel="stylesheet" href="/static/css/psw_val.css"/>
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
+<link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css"/>
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+      <div class="row justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-9 col-xl-7">
+          <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+            <div class="card-body p-4 p-md-5">
+              <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Новая заявка</h3>
+              <form action="/main/registration" method="POST" id='registration'>
+                {% csrf_token %}
+                <div class="row">
+                    <div class="row">
+                        <div class="col-6">
+                          <select class="select form-control-lg">
+                            <option selected disabled>Выберите сервис</option>
+                            <option value="1">Subject 1</option>
+                            <option value="2">Subject 2</option>
+                            <option value="3">Subject 3</option>
+                          </select>
+                        </div>
+                        <div class="col-6">
+                            <select class="select form-control-lg">
+                              <option selected disabled>Выберите мастера</option>
+                              <option value="1">Subject 1</option>
+                              <option value="2">Subject 2</option>
+                              <option value="3">Subject 3</option>
+                            </select>
+                          </div>
+                      </div>
+                      
+
+                        <div class="input-group date" id="id_1">
+                            <input type="text" value="05/16/2018 11:31:00" class="form-control" required/>
+                            <span class="input-group-addon">
+                                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    
+                        <div class="w-100"></div>
+                            <div class="col-md-6 mb-4">
+                            <div class="form-outline">
+                            <input type="text" name="first_name" id="firstName" class="form-control form-control-lg" title="Введите ваше имя "/>
+                            <span id="Errorfirst_name"></span>
+                            <label class="form-label" for="firstName">First Name</label>
+                        </div>
+                  
+  
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="form-outline">
+                            <input type="text" name="last_name" id="lastName" class="form-control form-control-lg" title="Введите ваше фамилие"/>
+                            <label class="form-label" for="lastName">Last Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4 pb-2">
+                            <div class="form-outline">
+                              <input type="tel" id="phoneNumber" name="phone_number" class="form-control form-control-lg" maxlength="15"   title="Enter 11 digit mobile number" placeholder="8(xxx)xxx-xx-xx"  />
+                              <label class="form-label" for="phoneNumber">Phone Number</label>
+                            </div>
+                        </div>
+
+
+
+                  <div class="col-md-6 mb-4">
+  
+                    <div class="form-outline">
+                      <input type="text" name="password2" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов." />
+                      <label class="form-label" for="psw">Confirm password</label>
+                    </div>
+
+                  </div>
+                </div>
+                <div id="message">
+                  <h3>Password must contain the following:</h3>
+                  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+                  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+                  <p id="number" class="invalid">A <b>number</b></p>
+                  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-4 d-flex align-items-center">
+  
+                    <div class="form-outline datepicker w-100">
+                      <input type="date" name="age" class="form-control form-control-lg" id="birthdayDate" />
+                      <label for="birthdayDate" class="form-label">Birthday</label>
+                    </div>
+  
+                  </div>
+                  <div class="col-md-6 mb-4">
+  
+                    <h6 class="mb-2 pb-1">Gender: </h6>
+  
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" name="gender" type="radio" name="inlineRadioOptions" id="femaleGender"
+                        value="1" checked />
+                      <label class="form-check-label" for="femaleGender">Female</label>
+                    </div>
+  
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" name="gender" type="radio" name="inlineRadioOptions" id="maleGender"
+                        value="2" />
+                      <label class="form-check-label" for="maleGender">Male</label>
+                    </div>
+  
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" name="gender" type="radio" name="inlineRadioOptions" id="otherGender"
+                        value="o" />
+                      <label class="form-check-label" for="otherGender">Other</label>
+                    </div>
+  
+                  </div>
+                </div>
+  
+                <div class="row">
+                  <div class="col-md-6 mb-4 pb-2">
+  
+                    <div class="form-outline">
+                      <input type="email" id="emailAddress" name="email" class="form-control form-control-lg" />
+                      <label class="form-label" for="emailAddress">Email</label>
+                    </div>
+  
+                  </div>
+                  <div class="col-md-6 mb-4 pb-2">
+
+                <div class="mt-4 pt-2">
+                  <input class="btn btn-success btn-lg" type="submit" value="Создать" />
+                </div>
+  
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock content %}
