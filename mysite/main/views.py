@@ -4,38 +4,40 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import resolve_url
 from django.views.generic import CreateView
 from main.models import CustomUser
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages 
 from django.contrib.auth.models import User 
+
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 def index(request):
     print("HELLO")
-
+    
     return render(request, 'main/index.html')
+    
+
+# def login(request):
+#     print("HELLO")
+#     if 'next' in request.POST:
+#                     return redirect(request.POST['next'])
+#     # return render(request, 'main/login.html')
+
 
 def login(request):
-    print("HELLO")
+    nxt = request.GET.get("next", None)
+    url = '/admin/login/'
 
-    return render(request, 'main/login.html')
+    if nxt is not None:
+        url += '?next=' + nxt
+    return redirect(url)
 def registration(request):
     print("HELLO")
 
     return render(request, 'main/registration.html')
-def registration_copy(request):
-    print("HELLO")
-    if request.method =="POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid(): 
-                form.save() 
-                # messages.success(request, 'Account created successfully') 
-        else: 
-                form = UserCreationForm() 
-        context = { 
-            'form':form 
-        } 
-    return render(request, 'main/registration_copy.html')
+
+
 
 
 
@@ -87,8 +89,9 @@ class CustomRegistrationView(CreateView):
         )
 
         return render(request, "main/registration_success.html")
-
+    
 def get_users(request):
+    print("ПРИШЛИ ДАННЫЕ С МОБИЛКИ")
     users = CustomUser.objects.all()
 
     print(users)
@@ -111,6 +114,25 @@ def check_username(request):
     print("FROM CLIENT: ", request.GET.get("checkUsername"))
 
     return JsonResponse({'exists': True})
-
+    
+@login_required(login_url='/main/login')
 def service(request):
     return render(request,'main/service.html')
+
+
+# апи который может принимать запросы извне
+@csrf_exempt
+def login_from_mobile(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+
+    return JsonResponse({"success": True})
+
+def check_user(request):
+    if request.method=="GET":
+        un = request.GET["username"]
+        check = CustomUser.objects.filter(username=un)
+        if len(check) == 1:
+            return HttpResponse("Exists")
+        else:
+            return HttpResponse("Not Exists")

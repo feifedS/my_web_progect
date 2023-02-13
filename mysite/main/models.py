@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.base_user import BaseUserManager
-
+from django.contrib.auth.models import AbstractUser
 
 class CustomUserManager(BaseUserManager):
     """
@@ -17,8 +17,8 @@ class CustomUserManager(BaseUserManager):
         
         if not email:
             raise ValueError(("The Email must be set"))
-        elif len(password) <=6:
-            raise ValueError(("Пороль должен быть строго больше 6 символов"))
+        # elif len(password) <=6:
+        #     raise ValueError(("Пороль должен быть строго больше 6 символов"))
         
         email = self.normalize_email(email)
         user = self.model(username=username, email=email, **extra_fields)
@@ -29,6 +29,17 @@ class CustomUserManager(BaseUserManager):
 class Gender(models.Model):
     name = models.CharField("Пол", max_length=1, blank=False, null=False, default="М")
 
+class User(AbstractUser):
+      DOCTOR = 1
+      NURSE = 2
+      SURGEN =3
+      
+      ROLE_CHOICES = (
+          (DOCTOR, 'Doctor'),
+          (NURSE, 'Nurse'),
+          (SURGEN, 'Surgen'),
+      )
+      role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
 
 class CustomUser(User):
     phone_number = models.CharField("Номер телефона", max_length=15, null=False, blank=False)
@@ -36,9 +47,10 @@ class CustomUser(User):
     age = models.DateField("Дата рождения", null=False, blank=False)
 
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
-
+    
     objects = CustomUserManager()
-
+    # role_objects = User()
+    
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
@@ -78,3 +90,4 @@ class MasterShadow(models.Model):
       day_of_week = models.ForeignKey(DayOfWeek, on_delete=models.CASCADE, verbose_name="День недели")
       working_hours = models.ForeignKey(WorkingHours,on_delete=models.CASCADE, verbose_name="Время работы")
       rest = models.ForeignKey(Rest,on_delete=models.CASCADE, verbose_name="Обед")
+

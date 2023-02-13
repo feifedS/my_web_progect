@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-vos--ltb$$=vz-c2ismn=(aq!__&xx=b^5@l23k)w_6p)e_pse
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -84,10 +84,12 @@ DATABASES = {
     }
 }
 DEBUG = True
-
+# LOGIN_URL = '/main/login/'
+# LOGIN_REDIRECT_URL ='index'
+LOGIN_URL = '/main/login'
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
+AUTH_USER_MODEL = "main.User" 
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

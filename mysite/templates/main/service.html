@@ -1,6 +1,7 @@
 {%  extends 'layout.html' %}
 {% comment %} {% block title %} {% endblock  %} {% endcomment %}
 {% block content %}
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -16,16 +17,20 @@
           <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
             <div class="card-body p-4 p-md-5">
               <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Новая заявка</h3>
-              <form action="/main/registration" method="POST" id='registration'>
+              <form action="/main/service" method="POST" id='service'>
                 {% csrf_token %}
                 <div class="row">
                     <div class="row">
                         <div class="col-6">
-                          <select class="select form-control-lg">
+                          <select class="select form-control-lg" name="day_of_week">
                             <option selected disabled>Выберите сервис</option>
-                            <option value="1">Subject 1</option>
-                            <option value="2">Subject 2</option>
-                            <option value="3">Subject 3</option>
+                            <option value="1">Понедельник</option>
+                            <option value="2">Вторник</option>
+                            <option value="3">Среда</option>
+                            <option value="4">Четверг</option>
+                            <option value="5">Пятница</option>
+                            <option value="6">Суббота</option>
+                            <option value="7">Воскресенье</option>
                           </select>
                         </div>
                         <div class="col-6">
@@ -40,7 +45,7 @@
                       
 
                         <div class="input-group date" id="id_1">
-                            <input type="text" value="05/16/2018 11:31:00" class="form-control" required/>
+                            <input type="text" value="05/16/2018 11:31:00" class="form-control" />
                             <span class="input-group-addon">
                                 <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
                             </span>

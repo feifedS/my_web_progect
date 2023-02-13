@@ -13,9 +13,14 @@
               <form action="/main/registration" method="POST" id='registration'>
                 {% csrf_token %}
                 <div class="row">
+                  
                   <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                      <p id="result"></p>
+                  </div>
                     <div class="form-outline">
-                      <input type="text" name="username" id="username" class="form-control form-control-lg" onkeyup="if (/[^|a-z0-9]+/g.test(this.value)) this.value = this.value.replace(/[^|a-z0-9]+/g,'')"  title="Введите ваш логин" />
+                      <input type="text" name="username" id="username" class="form-control form-control-lg" onkeyup="checkuser(); if (/[^|a-z0-9]+/g.test(this.value)) this.value = this.value.replace(/[^|a-z0-9]+/g,'')"  title="Введите ваш логин" />
+                      
                       <label class="form-label" for="username">UserName</label>
                     </div>
                     
@@ -41,7 +46,7 @@
                   <div class="col-md-6 mb-4">
   
                     <div class="form-outline">
-                      <input type="text" name="password1" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов."  />
+                      <input type="password" name="password1" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов."  />
                       <label class="form-label" for="psw">Password</label>
                     </div>
   
@@ -49,7 +54,7 @@
                   <div class="col-md-6 mb-4">
   
                     <div class="form-outline">
-                      <input type="text" name="password2" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов." />
+                      <input type="password" name="password2" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов." />
                       <label class="form-label" for="psw">Confirm password</label>
                     </div>
 
@@ -134,7 +139,7 @@
                 </div> {% endcomment %}
   
                 <div class="mt-4 pt-2">
-                  <input class="btn btn-success btn-lg" type="submit" value="Создать" />
+                  <input class="btn btn-success btn-lg" type="submit" value="Создать"  id="submitbtn" />
                 </div>
   
               </form>
@@ -144,4 +149,27 @@
       </div>
     </div>
   </section>
+  <script>
+    function checkuser(){
+        let un = document.getElementById("username").value;
+        $.ajax({
+            url:"{% url 'check_user' %}",
+            type:"get",
+            data:{username:un},
+            success:function(data){
+                if(data=="Exists"){
+                    $("#result").html("This username already taken").addClass("text-danger");
+                    {% comment %} $("#username").addClass("alert alert-danger"); {% endcomment %}
+                    $("#submitbtn").attr("disabled","disabled");
+                }else{
+                    $("#result").html("");
+                    $("#username").removeClass("alert alert-danger")
+                    $("#submitbtn").removeAttr("disabled");
+                }
+            }
+        })
+        
+    }
+  </script>
+  <script src="/static/js/phoneNumber_val.js"></script>
 {% endblock content %}
