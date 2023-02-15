@@ -9,13 +9,40 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages 
 from django.contrib.auth.models import User 
-
+from django.contrib.auth.decorators import permission_required 
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
+from functools import wraps
+
+def context(title, form):
+    return({"title": title, "form": form})
+
+def master_test_function(user):
+    if user.role == user.MASTER:
+        return True
+    return False
+
+def master_access_only():
+    def decorator(view):
+        @wraps(view)
+        def _wrapped_view(request, *args, **kwargs):
+            print("AAAAAAAAAAA: ", request.user.role)
+            if not master_test_function(request.user):
+                return HttpResponse("You are not a student and \
+                        you are not allowed to access this page !")
+            return view(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
+
+def role_required(user, login_url=None):
+    return user_passes_test(user.role == user.MASTER, login_url=login_url)
+
+
 # Create your views here.
 def index(request):
     print("HELLO")
     
-    return render(request, 'main/index.html')
+    return render(request, 'main/index.html', context('name', CustomUser))
     
 
 # def login(request):
@@ -86,6 +113,7 @@ class CustomRegistrationView(CreateView):
             last_name = request.POST.get("last_name"),
             gender_id = 1,
             phone_number = request.POST.get("phone_number"),
+            role = 1,
         )
 
         return render(request, "main/registration_success.html")
@@ -115,7 +143,9 @@ def check_username(request):
 
     return JsonResponse({'exists': True})
     
-@login_required(login_url='/main/login')
+# @login_required(login_url='/main/login')
+# @master_access_only()
+# @permission_required(service.can.view)
 def service(request):
     return render(request,'main/service.html')
 

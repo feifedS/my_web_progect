@@ -29,18 +29,6 @@ class CustomUserManager(BaseUserManager):
 class Gender(models.Model):
     name = models.CharField("Пол", max_length=1, blank=False, null=False, default="М")
 
-class User(AbstractUser):
-      DOCTOR = 1
-      NURSE = 2
-      SURGEN =3
-      
-      ROLE_CHOICES = (
-          (DOCTOR, 'Doctor'),
-          (NURSE, 'Nurse'),
-          (SURGEN, 'Surgen'),
-      )
-      role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
-
 class CustomUser(User):
     phone_number = models.CharField("Номер телефона", max_length=15, null=False, blank=False)
 
@@ -50,7 +38,16 @@ class CustomUser(User):
     
     objects = CustomUserManager()
     # role_objects = User()
-    
+    CUSTOMER = 1
+    MASTER = 2
+    # MODER =3
+      
+    ROLE_CHOICES = (
+          (CUSTOMER, 'Customer'),
+          (MASTER, 'Master'),
+        #   (MODER, 'Moder'),
+      )
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"

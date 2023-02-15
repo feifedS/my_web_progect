@@ -22,7 +22,7 @@ class Command(BaseCommand):
             )
             working_hour.save()
     def add_rest_hours(self):
-        rest_hours=['12.00-13.00','13.00-14.00','Выходной']
+        rest_hours=['12.00-13.00','13.00-14.00','python manage.py createsuperuserВыходной']
         if Rest.objects.all() != []:
             return
         for rest_hour in rest_hours:
