@@ -5,27 +5,40 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4 offset-md-4">
-            <form method="POST" action="/main/login">
-                {% csrf_token %}
-                <div class="form-group">
-                <label for="exampleInputEmail1">Логин</label>
-                <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Введите ваш логин">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            <div class="card" style="width: 18rem;">
+                <div class="card-title mb-0 text-center">
+                    <img class="card-img-top w-25" src="/static/images/login_icon.png" alt="Card image cap">
                 </div>
-                <div class="form-group">
-                <label for="exampleInputPassword1">Пароль</label>
-                <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Пароль">
+                <div class="card-body">
+                    <form method="POST" action="/main/login">
+                        {% for key, message in form.errors.items %}
+                            {% for error in message %}
+                                <p class="text-danger">{{ error }}<p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% csrf_token %}
+                        <div class="form-group">
+                        <label for="exampleInputEmail1">Логин</label>
+                        <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Введите ваш логин">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                        </div>
+                        <div class="form-group">
+                        <label for="exampleInputPassword1">Пароль</label>
+                        <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Пароль">
+                        </div>
+                        <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                        {% comment %} {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{request.GET.next}}" />
+          {% endif %} {% endcomment %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        <a href="{% url 'reset_password' %}">Забыли пароль?</a>
+                    </form>
                 </div>
-                <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                {% comment %} {% if request.GET.next %}
-  <input type="hidden" name="next" value="{{request.GET.next}}" />
-  {% endif %} {% endcomment %}
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+              </div>
         </div>
     </div>
 </div>

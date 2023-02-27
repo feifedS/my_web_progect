@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
-
+from django.utils import timezone
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -23,7 +23,10 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
+        group = Group.objects.get(name='customer')
         user.save()
+        user.groups.add(group)
+        # user.save()
         return user
 
 class Gender(models.Model):
@@ -47,7 +50,7 @@ class CustomUser(User):
           (MASTER, 'Master'),
         #   (MODER, 'Moder'),
       )
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=CUSTOMER)
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
@@ -88,3 +91,38 @@ class MasterShadow(models.Model):
       working_hours = models.ForeignKey(WorkingHours,on_delete=models.CASCADE, verbose_name="Время работы")
       rest = models.ForeignKey(Rest,on_delete=models.CASCADE, verbose_name="Обед")
 
+class Tag(models.Model):
+    name = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name
+    
+    
+
+class TypesOfServices(models.Model):
+    CATEGORY = (
+        ("Men's haircut", "Мужская стрижка"),
+        ("Women's haircut", "Женская стрижка"),
+        ("Children's haircut","Детская  стрижка"))
+    name = models.CharField(max_length=200, null=False, )
+    price = models.FloatField(null=True)
+    category = models.CharField(max_length=200, null=True,choices=CATEGORY)
+    description = models.CharField(max_length=200, null=True)
+    date_created = models.DateTimeField(auto_now_add=True,null=True)
+    tags = models.ManyToManyField(Tag)
+
+    def __str__(self):
+        return self.name
+
+
+class Order(models.Model):
+    STATUS = (
+        ("В ожиданий","В ожиданий"),
+        ("Выполнено","Выполнено")
+    )
+    customer = models.ForeignKey(CustomUser,null=True, on_delete= models.SET_NULL)
+    type_of_service = models.ForeignKey(TypesOfServices, null=True, on_delete= models.SET_NULL)
+    date_created = models.DateTimeField(default=timezone.now,null=True,)
+    status = models.CharField(max_length=200, null=True, choices=STATUS)
+    times_pick = models.DateTimeField(null=True)
+    # df

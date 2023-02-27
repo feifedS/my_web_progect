@@ -159,7 +159,7 @@
             success:function(data){
                 if(data=="Exists"){
                     $("#result").html("This username already taken").addClass("text-danger");
-                    {% comment %} $("#username").addClass("alert alert-danger"); {% endcomment %}
+                    $("#username").addClass("alert alert-danger");
                     $("#submitbtn").attr("disabled","disabled");
                 }else{
                     $("#result").html("");
@@ -171,5 +171,8 @@
         
     }
   </script>
+  <script src="/static/js/psw_val.js"></script>
   <script src="/static/js/phoneNumber_val.js"></script>
+  {% comment %} <script src="/static/js/psw_val.js"></script>s {% endcomment %}
+
 {% endblock content %}

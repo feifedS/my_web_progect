@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import CustomUser, Gender, DayOfWeek, WorkingHours, Rest, MasterShadow
+from main.models import *
 
 # Register your models here.
 admin.site.register(CustomUser)
@@ -8,3 +8,6 @@ admin.site.register(DayOfWeek)
 admin.site.register(WorkingHours)
 admin.site.register(Rest)
 admin.site.register(MasterShadow)
+admin.site.register(TypesOfServices)
+admin.site.register(Tag)
+admin.site.register(Order)
