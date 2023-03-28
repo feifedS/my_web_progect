@@ -149,22 +149,9 @@ LOGIN_REDIRECT_URL = 'index'
 
 
 
-# EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-# EMAIL_HOST= "smtp.gmail.com"
-# EMAIL_PORT= "587"
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = "nntasks@mail.ru"
-# EMAIL_HOST_PASSWORD ="ZXC01wz01$"
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-# EMAIL_HOST= "smtp.mail.ru"
-# EMAIL_PORT= "465"
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = "nntasks@mail.ru"
-# EMAIL_HOST_PASSWORD ="ArQwTjzFUUPzKWS7B9s7"
-# EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
-# DEFAULT_FROM_EMAIL= EMAIL_HOST_USER
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
