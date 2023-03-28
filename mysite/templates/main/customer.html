@@ -1,0 +1,77 @@
+{%  extends 'layout.html' %}
+{% comment %} {% block title %} {% endblock  %} {% endcomment %}
+{% block content %}
+
+<div class="container">
+<br>
+<div class="row">
+    <div class="col-md-5">
+        <h5>ГОСТЬ {{customer.username}}</h5>
+        <hr>
+        <div class="card card-body">
+            <a style="text-align: center; padding: 10px;" class="btn-primary btn-sm btn-blcok"  href="">Обновить гостя</a>
+            <a style="text-align: center; padding: 10px;" class="btn-primary btn-sm btn-blcok"  href="">Удалить гостя</a>
+            
+        </div>
+    </div>
+
+    <div class="col-md">
+        <div class="card card-body">
+            <h5>Контактная информация</h5>
+            <hr>
+            <p>Email:{{customer.email}}</p>
+            <p>Phone:{{customer.phone_number}}</p>
+        </div>
+    </div>
+    
+    <!-- <div class="col-md">
+        <div class="card card-body"> 
+            <h5>Все Заказы</h5>
+            <h1 style="text-align: center; padding: 10px;">fdf</h1>
+        </div>
+    </div>  -->
+</div>
+<br>
+<div class="row">
+    <div class="col-md">
+        <div class="card card-body">
+            <form method="get">
+                <button class="btn btn-primary" type="submit">Поиск</button>
+            </form>
+        </div>
+        
+    </div>
+</div>
+
+<br>
+<div class="row">
+    <div class="col-md">
+        <div class="card card-body">
+            <table class="table table-sm">
+                <div class="row">
+                    <div class = 'col'>Продукт</div>
+                    <div class = 'col'>Категория</div>
+                    <div class = 'col'>Дата Заказа</div>
+                    <div class = 'col'>Статус</div>
+                    <div class = 'col'></div>
+                    <div class = 'col'></div>
+                </div>
+            <hr>
+                {% for order in orders%}
+                <div class="row">
+                    <div class = 'col'>{{order.type_of_service}}</div>
+                    <div class = 'col'>{{order.type_of_service.category}}</div>
+                    <div class = 'col'>{{order.date_created}}</div>
+                    <div class = 'col'>{{order.status}}</div>
+                    <div class = 'col'><a class="btn btn-primary btn-info" href="">Обновить</a></div>
+                    <div class = 'col'><a class="btn btn-danger btn-info" href="">Удалить</a></div>
+                </div>
+            <hr>
+                {% endfor %}
+                
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock content %}

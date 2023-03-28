@@ -3,8 +3,8 @@
 {% block content %}
 <link rel="stylesheet" href="/static/css/registration.css"/>
 <link rel="stylesheet" href="/static/css/psw_val.css"/>
-<section class="vh-100 gradient-custom">
-    <div class="container py-5 h-100">
+<section class="gradient-custom">
+    <div class="container">
       <div class="row justify-content-center align-items-center h-100">
         <div class="col-12 col-lg-9 col-xl-7">
           <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
@@ -54,10 +54,10 @@
                   <div class="col-md-6 mb-4">
   
                     <div class="form-outline">
-                      <input type="password" name="password2" id="psw" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов." />
+                      <input type="password" name="password2" id="psw2" class="form-control form-control-lg" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Должен содержать не менее одной цифры и одной прописной и строчной буквы, а также не менее 8 символов." />
                       <label class="form-label" for="psw">Confirm password</label>
                     </div>
-
+                  
                   </div>
                 </div>
                 <div id="message">
@@ -114,17 +114,13 @@
 
                     
                     <div class="form-outline">
-                      <input type="tel" id="phoneNumber" name="phone_number" class="form-control form-control-lg" maxlength="15"   title="Enter 11 digit mobile number" placeholder="8(xxx)xxx-xx-xx"  />
+                      <input type="tel" id="phoneNumber" name="phone_number" class="form-control form-control-lg" maxlength="16"   title="Enter 11 digit mobile number" placeholder="8(xxx) xxx-xx-xx"/>
                       <label class="form-label" for="phoneNumber">Phone Number</label>
                     </div>
                     
                   </div>
                 </div>
-                <div>
-                  <input type="tel" id="numberonly" pattern="\d" maxlength="15">
-                </div>
-                <label for="tel">Telephone</label>
-                <input type="tel" id="telle" maxlength="15">
+                
 
                 
                 {% comment %} <div class="row">
@@ -170,9 +166,12 @@
         })
         
     }
-  </script>
-  <script src="/static/js/psw_val.js"></script>
-  <script src="/static/js/phoneNumber_val.js"></script>
-  {% comment %} <script src="/static/js/psw_val.js"></script>s {% endcomment %}
+
+                </script>
+  <script src="/static/js/phone_number_val.js" defer></script>
+  <script src="/static/js/psw_val.js" defer></script>
+                <!-- <script src="/static/js/psw_val.js"></script> -->
+                <!-- <script src="/static/js/phone_number_val.js"></script> -->
+                {% comment %} <script src="/static/js/psw_val.js"></script>s {% endcomment %}
 
 {% endblock content %}

@@ -11,36 +11,31 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import sys
+from dotenv import load_dotenv
 import os
+from mysite.conf import *
+load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vos--ltb$$=vz-c2ismn=(aq!__&xx=b^5@l23k)w_6p)e_pse'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-
+sys.path.append(BASE_DIR)
+sys.path.append(os.path.join(BASE_DIR, 'mysite'))
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
 INSTALLED_APPS = [
-    'main',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    
+    'rest_framework',
+    'channels',
+    'main',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +72,27 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'barbershop_db',
+       'USER': os.environ.get('DATABASE_USER'),
+       'PASSWORD': os.environ.get('DATABASE_PASS'),
+       'HOST': 'localhost',
+       'PORT': '5432',
+       
+   }
 }
+
+
+
 DEBUG = True
 # LOGIN_URL = '/main/login/'
 # LOGIN_REDIRECT_URL ='index'
@@ -159,7 +169,23 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'feifediki@gmail.com'
-EMAIL_HOST_PASSWORD ='zwrweqbyestbebto'
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 DEFAULT_FROM_EMAIL= EMAIL_HOST_USER
+
+REST_FRAMEWORK = {
+    # 'DEFAULT_RENDERER_CLASSES': [
+    #     'rest_framework.renderers.JSONRenderer',
+    # ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+
+    # 'DEFAULT_FILTER_BACKENDS': [
+    #     'django_filters.rest_framework.DjangoFilterBackend'
+    # ],
+}

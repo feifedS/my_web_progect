@@ -1,11 +1,35 @@
 {%  extends 'layout.html' %}
 
 {% block content %}
-
+<!-- 
 <div class="container">
     .row>.co
 </div>
- 
+  -->
+<br>
+<div class="row">
+    <div class="col-md">
+        <div class="card card-body">
+            <h5>Сервисы</h5>
+        </div>
+        <div class="card card-body">
+            <table class="table">
+                <tr>
+                    <th>Сервис</th>
+                    <th>Категория</th>
+                    <th>Цена</th>
+                </tr>
 
+                {% for i in typesofservices%}
+                    <tr>
+                        <td>{{i.name}}</td>
+                        <td>{{i.category}}</td>
+                        <td>{{i.price}}</td>
+                    </tr>
+                {%endfor%}
+            </table>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}

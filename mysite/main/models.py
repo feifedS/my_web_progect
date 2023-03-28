@@ -33,7 +33,7 @@ class Gender(models.Model):
     name = models.CharField("Пол", max_length=1, blank=False, null=False, default="М")
 
 class CustomUser(User):
-    phone_number = models.CharField("Номер телефона", max_length=15, null=False, blank=False)
+    phone_number = models.CharField("Номер телефона", max_length=16, null=False, blank=False)
 
     age = models.DateField("Дата рождения", null=False, blank=False)
 
@@ -98,15 +98,16 @@ class Tag(models.Model):
         return self.name
     
     
+class Category(models.Model):
+    name = models.CharField(max_length=200, null=True,)
+    def __str__(self):
+        return self.name
 
 class TypesOfServices(models.Model):
-    CATEGORY = (
-        ("Men's haircut", "Мужская стрижка"),
-        ("Women's haircut", "Женская стрижка"),
-        ("Children's haircut","Детская  стрижка"))
+    
     name = models.CharField(max_length=200, null=False, )
     price = models.FloatField(null=True)
-    category = models.CharField(max_length=200, null=True,choices=CATEGORY)
+    category = models.ForeignKey(Category,max_length=200, null=True,on_delete=models.CASCADE)
     description = models.CharField(max_length=200, null=True)
     date_created = models.DateTimeField(auto_now_add=True,null=True)
     tags = models.ManyToManyField(Tag)
@@ -114,15 +115,19 @@ class TypesOfServices(models.Model):
     def __str__(self):
         return self.name
 
+class Status(models.Model):
+    name = models.CharField(max_length=200, null=True, )
+
+    def __str__(self):
+        return self.name
 
 class Order(models.Model):
-    STATUS = (
-        ("В ожиданий","В ожиданий"),
-        ("Выполнено","Выполнено")
-    )
     customer = models.ForeignKey(CustomUser,null=True, on_delete= models.SET_NULL)
-    type_of_service = models.ForeignKey(TypesOfServices, null=True, on_delete= models.SET_NULL)
+    type_of_service = models.ForeignKey(TypesOfServices, null=True, on_delete= models.SET_NULL, verbose_name="Виды Сервисов")
     date_created = models.DateTimeField(default=timezone.now,null=True,)
-    status = models.CharField(max_length=200, null=True, choices=STATUS)
+    status = models.ForeignKey(Status,max_length=201, null=True, on_delete=models.CASCADE,default=1)
     times_pick = models.DateTimeField(null=True)
-    # df
+
+    def __str__(self):
+        return self.type_of_service.name
+    

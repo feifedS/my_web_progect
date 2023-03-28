@@ -1,0 +1,61 @@
+{%  extends 'layout.html' %}
+{% comment %} {% block title %} {% endblock  %} {% endcomment %}
+{% block content %}
+
+<br>
+<div class="row">
+    <div class="col-md-5">
+        <h5>ГОСТИ</h5>
+        <hr>
+        <div class="card card-body">
+            <a class="btn-primary btn-sm btn-blcok"  href="">Создать гостя</a>
+            <table>
+                <tr>
+                    <th>Гость</th>
+                    <th>Номер</th>
+                    <td>Открыть</td>
+                </tr>
+
+                {% for customer in customers %}
+                    <tr>
+                        <td> {{customer.username}} </td>
+                        <td>{{customer.phone_number}}</td>
+                        <td><a href="{% url 'customer' customer.id %}">Открыть</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <h5>Последние 5 заказов</h5>
+        <hr>
+        <div class="card card-body">
+            <a class="btn-primary btn-sm btn-blcok"  href="{% url 'order_form'%}">Создать услугу</a>
+            <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Услуга</th>
+                    <th>Когда</th>
+                    <th>Статус</th>
+                    <th>ОБновить</th>
+                    <th>Удалить</th>
+                </tr>
+                {% for order in orders %}
+                    <tr>
+                        <td> {{order.type_of_service}} </td>
+                        <td> {{order.date_created}}</td>
+                        <td>{{order.status}}</td>
+                        <td><a href="{% url 'update_order' order.id %}">Обновить</a></td>
+                        <td><a href="{% url 'delete_order' order.id %}">Удалить</a></td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+{% endblock content %}

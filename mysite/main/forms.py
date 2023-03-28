@@ -11,12 +11,32 @@ from django import forms
 #         fields = ("customer",,"times_pick",)
 
 class OrderForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(OrderForm, self).__init__(*args, **kwargs)
+            # there's a `fields` property now
+        self.fields['customer'].required = False
+        self.fields['type_of_service'].required = False
+        # self.fields['date_created'].required = False
+        self.fields['status'].required = False
+        self.fields['times_pick'].required = False
+        # for field in self.fields:
+        #     classes = self.fields[field].widget.attrs.get('class', '')
+        #     classes += ' form-control'
+        #     self.fields[field].widget.attrs['class'] = classes
     class Meta:
+        
         model = Order
         fields = ('customer', 'type_of_service',
-                'date_created', 'status', 'times_pick',)
-        widgets = {
-            'times_pick': forms.DateTimeInput(
-                attrs={'class': "form-control"}
-            ),
-        }
+                'status', 'times_pick',)
+        
+
+# class OrderForm(forms.ModelForm):
+#     class Meta:
+#         model = Order
+#         fields = ('__all__')
+#         # widgets = {
+#         #     'times_pick': forms.DateTimeInput(
+#         #         attrs={'class': "form-control"}
+#         #     ),
+            
+#         # }

@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
@@ -20,10 +21,13 @@ from django.db.models.query_utils import Q
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
+from django.contrib.auth import get_user_model
 # CUSTOM MODULES
 from .models import *
 from .forms import *
 from main.decorators import unauthenticated_user, allowed_users
+
+from rest_framework.generics import CreateAPIView
 
 
 def context(title, form):
@@ -84,7 +88,6 @@ def registration(request):
 @method_decorator(unauthenticated_user(), name='dispatch')
 class CustomLoginView(LoginView):   
     template_name='main/login.html'
-    print("custom HHHHHHHHHHH")
     
     def get_success_url(self):
         return resolve_url('index')
@@ -95,6 +98,32 @@ class CustomLogoutView(LogoutView):
     
     def get_success_url(self):
         return resolve_url('logout')
+
+
+class CustomRegistrationAPIView(CreateAPIView):
+    model = CustomUser
+
+    def post(self, request):
+        print("PARAMETRY: %s"%request.data)
+        password = ""
+        if request.data.get("password1") != request.data.get("password2"):
+            return render(request, "main/registration.html")
+        else:
+            password = request.data.get("password1")
+
+        CustomUser.objects.create_user(
+            username = request.data.get("username"),
+            password = password,
+            email = request.data.get("email"),
+            age = request.data.get("age"),
+            first_name = request.data.get("first_name"),
+            last_name = request.data.get("last_name"),
+            gender_id = 1,
+            phone_number = request.data.get("phone_number"),
+            role = 1,
+        )
+
+        return render(request, "main/registration_success.html")
 
 
 class CustomRegistrationView(CreateView):
@@ -170,9 +199,85 @@ def check_username(request):
 def service(request):
     return render(request,'main/service.html')
 
+
 @allowed_users(allowed_roles=['administrator'])
 def administration(request):
-    return render(request,'main/administration.html')
+    typesofservices = TypesOfServices.objects.all()
+    return render(request,'main/administration.html',{'typesofservices':typesofservices} )
+
+@allowed_users(allowed_roles=['administrator'])
+def dashboard(request):
+    orders=Order.objects.all()
+    customers=CustomUser.objects.all()
+    context={"orders":orders,"customers":customers,}
+    return render(request,'main/dashboard.html', context )
+
+@allowed_users(allowed_roles=['administrator'])
+def customer(request,user_ptr_id):
+    customer=CustomUser.objects.get(id=user_ptr_id)
+    orders = customer.order_set.all()
+
+    context = {"customer":customer,"orders":orders,}
+    return render(request,'main/customer.html', context )
+
+def order_form(request):
+    
+    form = OrderForm()
+    customers=CustomUser.objects.all()
+    
+    if request.method == 'POST':
+        
+        # print("print post:",request.POST)
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            
+            form.save()
+            return redirect("dashboard")
+    context = {'form':form}
+    return render(request,'main/order_form.html', context )
+
+
+@login_required
+def OrderFormView(request):
+    print("ddddddddddddddddddddddddddddddddd")
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        if form.is_valid():
+            print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+            form.Status = 'В ожиданий'
+            order = form.save(commit=False)
+            order.customer = request.user.customuser
+            order.status = Status.objects.get(name='В ожиданий')
+            order.save()
+            print("ddd")
+            return redirect('index')
+    else:
+        print("88888888888888888888888888888888888888")
+        form = OrderForm()
+    return render(request, 'main/service.html', {'form': form})
+
+
+
+def updateOrder(request, pk):
+    order = Order.objects.get(id=pk)
+    form = OrderForm(instance=order)
+    if request.method == 'POST':
+        # print("print post:",request.POST)
+        form = OrderForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard")
+    context = {'form':form}
+    return render(request,'main/order_form.html', context )
+
+def deleteOrder(request, pk):
+    order = Order.objects.get(id=pk)
+    context = {"order":order,}
+    if request.method=="POST":
+        order.delete()
+        return redirect("dashboard" )    
+    return render(request,'main/delete.html', context )
 
 # апи который может принимать запросы извне
 @csrf_exempt
@@ -245,4 +350,5 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
 
 def OrderView(request):
     form= OrderForm()
+    
     return render(request, "main/service.html", {"title": 'hello', "form": form})

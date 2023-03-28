@@ -1,0 +1,17 @@
+{%  extends 'layout.html' %}
+{% comment %} {% block title %} {% endblock  %} {% endcomment %}
+{% block content %}
+<br>
+<div class="row">
+    <div class="col-md">
+        <div class="card card-body">
+            <p> Вы уверены чот хотите удалить  заказ "{{order}}" для {{order.customer}} </p>
+            <form action="{% url 'delete_order' order.id %}" method="POST">
+                {% csrf_token %}
+                <a class="btn btn-primary btn-info" href="{% url 'dashboard' %}">Отмена</a>
+                <input class="btn btn-danger btn-info" type="submit" name="Удалить">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
