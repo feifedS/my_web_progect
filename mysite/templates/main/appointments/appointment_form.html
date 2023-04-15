@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2 class="text-center mb-4">Make a Booking</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_barber">Select Barber:</label>
+          <select class="form-control" id="id_barber" name="barber">
+            {% for barber in barbers %}
+              <option value="{{ barber.id }}">{{ barber.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="id_date">Select Date:</label>
+          <div class="input-group date" id="date-picker" data-target-input="nearest">
+            <input type="text" class="form-control datetimepicker-input" name="date" data-target="#date-picker" required/>
+            <div class="input-group-append" data-target="#date-picker" data-toggle="datetimepicker">
+              <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Check Availability</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+  $(function () {
+    $('#date-picker').datetimepicker({
+      format: 'YYYY-MM-DD',
+      minDate: new Date()
+    });
+  });
+</script>
+{% endblock %}

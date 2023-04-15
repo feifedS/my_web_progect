@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h2>Записаться на прием</h2>
+  <form onsubmit="return validateForm()" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <label for="id_time"></label>
+    
+    <input type="submit" value="Выбрать время">
+    <div id="error-message"></div> 
+  </form>
+
+
+  <script src="/static/js/category.js" defer></script>
+{% endblock %}
+

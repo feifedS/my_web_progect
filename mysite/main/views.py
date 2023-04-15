@@ -1,8 +1,9 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import resolve_url
+from django.views import View
 from django.views.generic import CreateView
 from django.http import JsonResponse, HttpResponse
 from django.core import serializers
@@ -12,7 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test, login_required, permission_required
 from functools import wraps
 from django.utils.decorators import method_decorator
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.forms import PasswordResetForm
@@ -23,13 +24,15 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 # CUSTOM MODULES
+from .models import Order, TypesOfServices, Status
 from .models import *
 from .forms import *
 from main.decorators import unauthenticated_user, allowed_users
-
+import datetime
+import pytz
 from rest_framework.generics import CreateAPIView
-
-
+from rest_framework.response import Response
+from rest_framework.views import APIView
 def context(title, form):
     return({"title": title, "form": form})
 
@@ -98,8 +101,91 @@ class CustomLogoutView(LogoutView):
     
     def get_success_url(self):
         return resolve_url('logout')
+# def OrderFormAPIView(request):
+#     print("ddddddddddddddddddddddddddddddddd")
+#     if request.method == 'POST':
+#         form = OrderForm(request.POST)
+#         print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+#         if form.is_valid():
+#             print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+#             form.Status = 'В ожиданий'
+#             order = form.save(commit=False)
+#             order.customer = request.user.customuser
+#             order.status = Status.objects.get(name='В ожиданий')
+#             order.save()
+#             print("ddd")
+#             return redirect('index')
 
 
+# class OrderFormAPIView(APIView):
+#     def post(self, request):
+#         # extract the `times_pick` value from the request data and convert to desired format
+#         times_pick_str = request.data.get('times_pick')
+#         timezone = pytz.timezone('Asia/Almaty')
+#         times_pick = datetime.strptime(times_pick_str, '%d.%m.%Y %H:%M:%S')
+#         times_pick = timezone.localize(times_pick)
+#         request.data['times_pick'] = times_pick
+
+#         # create the `OrderForm` instance and handle form submission
+#         form = OrderForm(request.data)
+#         if form.is_valid():
+#             order = form.save(commit=False)
+#             order.status = Status.objects.get(name='В ожидании')
+#             order.customer = request.user.customuser
+#             order.save()
+#             return Response({'status': 'success', 'message': 'Order created successfully!'})
+#         else:
+#             return Response({'status': 'error', 'message': 'Invalid form data!'})
+
+
+
+class OrderFormAPIView(CreateAPIView):
+    def post(self, request):
+        # extract the values from the request data
+        customer_id = request.user.customuser.id
+        type_of_service_id = request.data.get("type_of_service")
+        times_pick_str = request.data.get('times_pick')
+        date_created = timezone.now()
+        # convert the `times_pick` value to a `datetime` object with the correct timezone
+        timezone_str = 'Asia/Almaty'  # set to the appropriate timezone
+        timezonew = pytz.timezone(timezone_str)
+        times_pick = datetime.strptime(times_pick_str, '%d.%m.%Y %H:%M:%S')
+        times_pick = timezonew.localize(times_pick)
+        
+        # get the current time in the UTC timezone
+        utc_now = datetime.utcnow()
+        type_of_service = TypesOfServices.objects.get(name=request.data.get("type_of_service"))
+        # convert the UTC time to the Asia/Almaty timezone
+        # almaty_tz = pytz.timezone('Asia/Almaty')
+        # almaty_now = utc_now.replace(tzinfo=pytz.utc).astimezone(almaty_tz)
+        
+        # create the `Order` object and save it
+        Order.objects.create(
+            customer_id=customer_id,
+            type_of_service=type_of_service,
+            date_created = date_created,
+            status=Status.objects.get(name='В ожиданий'),
+            times_pick=times_pick
+        )
+        
+        return Response({'status': 'success', 'message': 'Order created successfully!'})
+    
+class BookingAPIView(CreateAPIView):
+    def post(self, request):
+        # extract the values from the request data
+        customer_id = request.user.customuser.id
+        date_id= request.data.get("date")
+        time_id= request.data.get("time")
+        barber_id = request.data.get("barber")
+        service_id = request.data.get("service")
+        Booking.objects.create(
+            customer_id=customer_id,
+            date = date_id,
+            time = time_id,
+            barber_id = barber_id,
+            service_id = service_id,
+        )
+        return Response({'status': 'success', 'message': 'Order created successfully!'})
 class CustomRegistrationAPIView(CreateAPIView):
     model = CustomUser
 
@@ -124,6 +210,19 @@ class CustomRegistrationAPIView(CreateAPIView):
         )
 
         return render(request, "main/registration_success.html")
+
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = CustomUserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile was updated successfully!')
+    else:
+        form = CustomUserForm(instance=request.user)
+    
+    return render(request, 'main/profile.html', {'form': form})
 
 
 class CustomRegistrationView(CreateView):
@@ -207,7 +306,7 @@ def administration(request):
 
 @allowed_users(allowed_roles=['administrator'])
 def dashboard(request):
-    orders=Order.objects.all()
+    orders=Booking.objects.all()
     customers=CustomUser.objects.all()
     context={"orders":orders,"customers":customers,}
     return render(request,'main/dashboard.html', context )
@@ -215,7 +314,7 @@ def dashboard(request):
 @allowed_users(allowed_roles=['administrator'])
 def customer(request,user_ptr_id):
     customer=CustomUser.objects.get(id=user_ptr_id)
-    orders = customer.order_set.all()
+    orders = customer.booking_set.all()
 
     context = {"customer":customer,"orders":orders,}
     return render(request,'main/customer.html', context )
@@ -257,14 +356,31 @@ def OrderFormView(request):
         form = OrderForm()
     return render(request, 'main/service.html', {'form': form})
 
-
+# def OrderFormAPIView(request):
+#     print("ddddddddddddddddddddddddddddddddd")
+#     if request.method == 'POST':
+#         form = OrderForm(request.POST)
+#         print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+#         if form.is_valid():
+#             print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+#             form.Status = 'В ожиданий'
+#             order = form.save(commit=False)
+#             order.customer = request.user.customuser
+#             order.status = Status.objects.get(name='В ожиданий')
+#             order.save()
+#             print("ddd")
+#             return redirect('index')
+#     else:
+#         print("88888888888888888888888888888888888888")
+#         form = OrderForm()
+#     return render(request, 'main/service.html', {'form': form})
 
 def updateOrder(request, pk):
-    order = Order.objects.get(id=pk)
-    form = OrderForm(instance=order)
+    order = Booking.objects.get(id=pk)
+    form = BookinForm(instance=order)
     if request.method == 'POST':
         # print("print post:",request.POST)
-        form = OrderForm(request.POST, instance=order)
+        form = BookinForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
             return redirect("dashboard")
@@ -272,7 +388,7 @@ def updateOrder(request, pk):
     return render(request,'main/order_form.html', context )
 
 def deleteOrder(request, pk):
-    order = Order.objects.get(id=pk)
+    order = Booking.objects.get(id=pk)
     context = {"order":order,}
     if request.method=="POST":
         order.delete()
@@ -352,3 +468,132 @@ def OrderView(request):
     form= OrderForm()
     
     return render(request, "main/service.html", {"title": 'hello', "form": form})
+
+
+def appointment_confirmation(request):
+    return render(request, 'main/appointment_confirmation.html')
+
+# def book_appointment(request):
+#     if request.method == 'POST':
+#         form = AppointmentForm(request.POST)
+#         if form.is_valid():
+#             barber = form.cleaned_data['barber']
+#             appointment_date = form.cleaned_data['appointment_date']
+#             available_time_slots = AvailableTimeSlot.get_available_time_slots(barber, appointment_date)
+#             return render(request, 'main/book_appointment.html', {'form': form, 'available_time_slots': available_time_slots})
+            
+        
+#     else:
+#         form = AppointmentForm(initial={'appointment_date': timezone.now().date()})
+#     return render(request, 'main/book_appointment.html', {'form': form})
+def booking_success(request, booking_id):
+    booking = Booking.objects.get(id=booking_id)
+    return render(request, 'booking/success.html', {'booking': booking})
+
+def booking_error(request):
+    return render(request, 'booking/error.html')
+
+@login_required
+def book(request,service_id=None, barber_id=None, date=None, time=None):
+    if not all([service_id,barber_id, date, time]):
+        # handle missing arguments error
+        return render(request, 'booking/error.html')
+    service = get_object_or_404(TypesOfServices, id=service_id)
+    barber = get_object_or_404(Barber, user_id=barber_id)
+    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+    if not Booking.objects.filter(service=service, barber=barber, date=date, time=time).exists():
+        booking = Booking.objects.create(service=service,barber=barber, customer=request.user.customuser, date=date, time=time)
+        return render(request, 'main/booking/success.html', {'booking': booking})
+
+    return render(request, 'main/booking/error.html')
+
+# def available_times(request):
+#     if request.method == 'POST':
+#         form = BookingForm(request.POST)
+#         if form.is_valid():
+#             service = form.cleaned_data['service']
+#             barber = form.cleaned_data['barber']
+#             date = form.cleaned_data['date']
+#             bookings = Booking.objects.filter(service=service,barber=barber, date=date).values_list('time', flat=True)
+
+#             available_times = []
+#             start_time = datetime.datetime.combine(date, datetime.time.min) + datetime.timedelta(hours=9)
+#             end_time = datetime.datetime.combine(date, datetime.time.min) + datetime.timedelta(hours=18) 
+#             while start_time < end_time:
+#                 if start_time.time() not in bookings:
+#                     available_times.append(start_time.time())
+#                 start_time += datetime.timedelta(minutes=30)
+
+#             context = {
+#                 'service': service,
+#                 'barber': barber,
+#                 'date': date,
+#                 'available_times': available_times
+#             }
+
+#             return render(request, 'main/booking/available_times.html', context)
+#     else:
+#         form = BookingForm()
+
+#     context = {
+#         'form': form
+#     }
+
+#     # if 'barber' in request.GET and 'date' in request.GET and 'time' in request.GET:
+#     #     barber_id = request.GET['barber']
+#     #     date = request.GET['date']
+#     #     time = request.GET['time']
+#     #     return redirect(reverse('book') + f'?barber={barber_id}&date={date}&time={time}')
+
+#     return render(request, 'main/booking/book.html', context)
+
+
+
+def available_times(request):
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            service = form.cleaned_data['service']
+            barber = form.cleaned_data['barber']
+            date = form.cleaned_data['date']
+            bookings = Booking.objects.filter(service=service, barber=barber, date=date).values_list('time', flat=True)
+            available_times = []
+            start_time = datetime.datetime.combine(date, datetime.time.min) + timedelta(hours=8.5)
+            end_time = datetime.datetime.combine(date, datetime.time.min) + timedelta(hours=18)
+            
+            
+            if datetime.datetime.now().date() == date and datetime.datetime.now().time() < end_time.time():
+                start_time = max(start_time, datetime.datetime.now())
+            
+            while start_time < end_time:
+                if start_time.time() not in bookings:
+                    
+                    rounded_time = datetime.time(start_time.hour, start_time.minute // 30 * 30)
+                    available_times.append(rounded_time)
+                start_time += timedelta(minutes=30)
+
+            available_times = list(set(available_times) - set(bookings))
+            available_times.sort()
+
+            del available_times[0]
+
+            context = {
+                'service': service,
+                'barber': barber,
+                'date': date,
+                'available_times': available_times
+            }
+
+            return render(request, 'main/booking/available_times.html', context)
+    else:
+        form = BookingForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'main/booking/book.html', context)
+
+        

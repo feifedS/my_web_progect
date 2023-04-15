@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <h2>{{ barber }} - {{ appointment_date }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <label for="start_time">Select a time slot:</label>
+    <select name="start_time" id="start_time">
+      {% for time_slot in available_time_slots %}
+        <option value="{{ time_slot }}">{{ time_slot }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Book Appointment</button>
+  </form>
+{% endblock %}

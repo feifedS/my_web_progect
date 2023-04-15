@@ -42,8 +42,8 @@ class Command(BaseCommand):
             status.save()
     def add_categoty(self):
         categories=['Стрижка','Укладка',]
-        if Rest.objects.all() != []:
-            return
+        # if Rest.objects.all() != []:
+        #     return
         for category in categories:
             category = Category(
                 name = category
@@ -58,8 +58,8 @@ class Command(BaseCommand):
         self.add_status()
         self.add_categoty()
         genders = ['f', 'm']
-        if Gender.objects.all() != []:
-            return
+        # if Gender.objects.all() != []:
+        #     return
         for gender in genders:
             gender = Gender(
                 name = gender

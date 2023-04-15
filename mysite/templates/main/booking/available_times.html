@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <h1>Доступное время бронирования</h1>
+  <p>Свободное время для услуги {{service}} у мастера {{ barber }} на {{ date }}:</p>
+  <ul>
+    {% for time in available_times %}
+      <li><a href="{% url 'book' service_id=service.id barber_id=barber.user.id date=date time=time %}">{{ time }}</a></li>
+    {% empty %}
+      <li>Нет свободного времени на эту дату</li>
+    {% endfor %}
+  </ul>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="barber_id" value="{{ barber.user.id }}">
+    <button type="submit">Сменить дату</button>
+  </form>
+{% endblock %}

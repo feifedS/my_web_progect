@@ -1,0 +1,72 @@
+
+{% extends 'layout.html' %}
+{% comment %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/date.css">
+<form  method="post" id="appointment-form">
+    {% csrf_token %}
+    {{ form.barber }}
+    {{ form.appointment_date }}
+    
+    <button type="submit">Submit</button>
+</form>
+
+{% if available_time_slots %}
+    <h2>Available Time Slots</h2>
+    <form method="post" id="time-slot-form">
+        {% csrf_token %}
+        <ul>
+            {% for time_slot in available_time_slots %}
+                {% if time_slot >= '09:00' and time_slot <= '18:00' %}
+                    <li>
+                        <label>
+                            <input type="radio" name="time_slot" value="{{ time_slot }}">
+                            {{ time_slot }}
+                        </label>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <button type="submit">Book</button>
+    </form>
+{% endif %}
+
+<script>
+    const appointmentForm = document.querySelector('#appointment-form');
+    const timeSlotForm = document.querySelector('#time-slot-form');
+
+    timeSlotForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const selectedTimeSlot = document.querySelector('input[name="time_slot"]:checked').value;
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'start_time';
+        hiddenInput.value = selectedTimeSlot;
+        appointmentForm.appendChild(hiddenInput);
+        appointmentForm.submit();
+    });
+</script>
+{% endblock %}
+{% endcomment %}
+
+
+{% block content %}
+  <h1>Book Appvointment</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if available_time_slots %}
+      <div class="form-group">
+        <label for="id_start_time">Available Time Slots:</label>
+        <select name="start_time" id="id_start_time" class="form-control">
+          {% for time_slot in available_time_slots %}
+            <option value="{{ time_slot }}">{{ time_slot }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Book Appointment</button>
+  </form>
+{% endblock %}

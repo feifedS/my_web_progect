@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <h1>Успешно забронировано!</h1>
+  <p>Ваше бронирование подтверждено для:</p>
+  <ul>
+    <li>Мастер: {{ booking.barber }}</li>
+    <li>День: {{ booking.date }}</li>
+    <li>Время: {{ booking.time }}</li>
+  </ul>
+{% endblock %}

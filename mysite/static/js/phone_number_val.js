@@ -1,27 +1,7 @@
 
 window.onload = function(){ 
-// var tele = document.querySelector('#phoneNumber');
 
-// tele.addEventListener('keyup', function(e){
-    
-//   if (Event.key != 'Backspace' && (tele.value.length === 1 || tele.value.length === 20)){
-//   tele.value += '(';
-//   }
-//   if (Event.key != 'Backspace' && (tele.value.length === 5  || tele.value.length === 20)){
-//     tele.value += ')';
-//   }
-//   if (Event.key != 'Backspace' && (tele.value.length === 9  || tele.value.length === 12)){
-//     tele.value += '-';
-//   }
 
-// });
-
-// document.querySelector("#phoneNumber").addEventListener("keypress", function (evt) {
-//     if (evt.which < 48 || evt.which > 57)
-//     {
-//         evt.preventDefault();
-//     }
-// });
 var phoneField = document.getElementById('phoneNumber');
     phoneField.addEventListener('keyup', function(){
     var phoneValue = phoneField.value || "";
@@ -45,7 +25,7 @@ var phoneField = document.getElementById('phoneNumber');
     }
     else if (areas.length == 1 && area.length > 0 && area.length <3  ) {
       output =  areas +"(" + area;
-      // areas.length == 1 && area.length == 3 && pre.length < 3||
+    
   }
     else if (phoneValue.length >= 4 && phoneValue.length < 7) {
         output = areas + "(" + area + ")" + " " + pre;
@@ -56,7 +36,7 @@ var phoneField = document.getElementById('phoneNumber');
       output =areas + "(" + area + ")" + " " + pre + "-"+tel +"-"+tele;
   }
   phoneField.value = output;
-  // areas.length == 1 && area.length == 3 && pre.length == 3
+
 });
 
 var phone = document.getElementById('phoneNumber'),

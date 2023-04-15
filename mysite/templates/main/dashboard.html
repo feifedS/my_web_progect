@@ -35,16 +35,20 @@
             <div class="table-responsive">
             <table class="table">
                 <tr>
+                    <th>Гость</th>
                     <th>Услуга</th>
                     <th>Когда</th>
+                    <th>Мастер</th>
                     <th>Статус</th>
-                    <th>ОБновить</th>
+                    <th>Обновить</th>
                     <th>Удалить</th>
                 </tr>
                 {% for order in orders %}
                     <tr>
-                        <td> {{order.type_of_service}} </td>
-                        <td> {{order.date_created}}</td>
+                        <td> {{order.customer.first_name}} {{order.customer.last_name}}</td>
+                        <td> {{order.service}} </td>
+                        <td> {{order.date}} {{order.time}}</td>
+                        <td>{{order.barber}}</td>
                         <td>{{order.status}}</td>
                         <td><a href="{% url 'update_order' order.id %}">Обновить</a></td>
                         <td><a href="{% url 'delete_order' order.id %}">Удалить</a></td>

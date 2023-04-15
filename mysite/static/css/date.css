@@ -1,0 +1,8 @@
+.booking-form-date {
+    background-color: #99ff99; /* light green */
+  }
+  
+  /* Style for dates after the next 21 days */
+  .booking-form-date.future-date {
+    background-color: #ff9999; /* light red */
+  }

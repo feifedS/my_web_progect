@@ -10,19 +10,38 @@ class PublisherSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = '__all__'
 
+
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
 
 
-class TypesOfServicesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TypesOfServices
-        fields = ('id','name','price','category','description','tags')
-
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = "__all__"
+
+
+class TypesOfServicesSerializer(serializers.ModelSerializer):
+    category = CategoriesSerializer()
+    tags = TagSerializer(many=True)
+    class Meta:
+        model = TypesOfServices
+        fields = ('id','name','price','category','description','tags')
+
+class BarberSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = Barber
+        fields = "__all__"
+
+class BookingSerilizer(serializers.ModelSerializer):
+    class Meta: 
+        model = Booking
+        fields = "__all__"

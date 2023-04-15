@@ -52,6 +52,7 @@
                     <div class = 'col'>Продукт</div>
                     <div class = 'col'>Категория</div>
                     <div class = 'col'>Дата Заказа</div>
+                    <div class = 'col'>Мастер</div>
                     <div class = 'col'>Статус</div>
                     <div class = 'col'></div>
                     <div class = 'col'></div>
@@ -59,12 +60,13 @@
             <hr>
                 {% for order in orders%}
                 <div class="row">
-                    <div class = 'col'>{{order.type_of_service}}</div>
-                    <div class = 'col'>{{order.type_of_service.category}}</div>
-                    <div class = 'col'>{{order.date_created}}</div>
+                    <div class = 'col'>{{order.service}}</div>
+                    <div class = 'col'>{{order.service.category}}</div>
+                    <div class = 'col'>{{order.date}} {{order.time}}</div>
+                    <div class = 'col'>{{order.barber}}</div>
                     <div class = 'col'>{{order.status}}</div>
-                    <div class = 'col'><a class="btn btn-primary btn-info" href="">Обновить</a></div>
-                    <div class = 'col'><a class="btn btn-danger btn-info" href="">Удалить</a></div>
+                    <div class = 'col'><a class="btn btn-primary btn-info" href="{% url 'update_order' order.id %}">Обновить</a></div>
+                    <div class = 'col'><a class="btn btn-danger btn-info" href="{% url 'delete_order' order.id %}">Удалить</a></div>
                 </div>
             <hr>
                 {% endfor %}
