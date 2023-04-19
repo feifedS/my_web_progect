@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Update Profile</h1>
+    <form method="post" action="{% url 'profile' %}">
+        {% csrf_token %}
+        
+        <input type="submit" value="Update">
+    </form>
+{% endblock %}

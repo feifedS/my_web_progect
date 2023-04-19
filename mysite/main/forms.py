@@ -2,6 +2,8 @@ from datetime import timedelta
 from .models import *
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
+from phonenumber_field.formfields import PhoneNumberField
+from phonenumber_field.widgets import PhoneNumberPrefixWidget
 # class Order(forms.ModelForm):
     
 #     class Meta:
@@ -117,6 +119,7 @@ class BookinForm(forms.ModelForm):
         
 
 class CustomUserForm(UserChangeForm):
+    phone_number = PhoneNumberField()
 
     class Meta:
         model = CustomUser

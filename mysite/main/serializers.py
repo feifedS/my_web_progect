@@ -37,11 +37,14 @@ class TypesOfServicesSerializer(serializers.ModelSerializer):
         fields = ('id','name','price','category','description','tags')
 
 class BarberSerilizer(serializers.ModelSerializer):
+    services = TypesOfServicesSerializer(many =True)
     class Meta:
         model = Barber
         fields = "__all__"
 
 class BookingSerilizer(serializers.ModelSerializer):
+    barber = BarberSerilizer()
+    service = TypesOfServicesSerializer()
     class Meta: 
         model = Booking
-        fields = "__all__"
+        fields = ('id','date','time','barber','customer','service')

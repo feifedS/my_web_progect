@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.contrib.auth import views as auth_views
+# from .views import *
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -25,8 +26,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # path('main/',include('django.contrib.auth.urls'))
-    # path('registration_copy/',registration_copy, name = 'registration_copy'),
+    # path('registration_copy/',registration_copy, name = 'registration_copy')
 
 
+
+    path('password/', auth_views.PasswordResetView.as_view(
+        template_name='main/reset_pass/reset_password.html'), name="fgt"),
+    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(
+        template_name='main/reset_pass/reset_password_sent.html'), name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='main/reset_pass/password_reset_confirm.html'), name="password_reset_confirm"),
+    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='main/reset_pass/password_reset_complete.html'), name="password_reset_complete"),
     
 ]

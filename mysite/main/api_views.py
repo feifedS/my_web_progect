@@ -1,7 +1,8 @@
+from django.http import HttpResponse
 from rest_framework.generics import ListAPIView, GenericAPIView, ListCreateAPIView
 from .serializers import  *
 from rest_framework.generics import ListAPIView
-
+#
 from rest_framework import generics
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
@@ -12,6 +13,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework import status
 from .models import *
 from rest_framework.permissions import IsAuthenticated
+import datetime
+import json
 # class ServicesListView(ListAPIView):
 #     model = 
 
@@ -109,7 +112,45 @@ class BookingApiList(generics.ListAPIView):
     serializer_class = BookingSerilizer
     queryset = Booking.objects.all()
     permission_classes = [IsAuthenticated]
+
 class BarberApiListGET(generics.ListAPIView):
     serializer_class = BarberSerilizer
     queryset = Barber.objects.all()
     permission_classes = [IsAuthenticated]
+
+class SendTimesAPI(APIView):
+    def post(self, request):
+        print(request.POST)
+        barber_id = Barber.objects.get(name=request.data.get("type_of_service"))
+        barber= barber_id
+        date_str = request.data.get('times_pick')
+        date = datetime.datetime.strptime(date_str, '%d.%m.%Y').date()
+        bookings = Booking.objects.filter(barber=barber, date=date).values_list('time', flat=True)
+        available_times = []
+        start_time = datetime.datetime.combine(date, datetime.time.min) + datetime.timedelta(hours=8.5)
+        end_time = datetime.datetime.combine(date, datetime.time.min) + datetime.timedelta(hours=18)
+        
+        
+        if datetime.datetime.now().date() == date and datetime.datetime.now().time() < end_time.time():
+            start_time = max(start_time, datetime.datetime.now())
+        
+        while start_time < end_time:
+            if start_time.time() not in bookings:
+                
+                rounded_time = datetime.time(start_time.hour, start_time.minute // 30 * 30)
+                available_times.append(rounded_time)
+            start_time += datetime.timedelta(minutes=30)
+
+        available_times = list(set(available_times) - set(bookings))
+        available_times.sort()
+
+        del available_times[0]
+        print(available_times)
+        for i in range(len(available_times)):
+            available_times[i] = available_times[i].strftime('%H:%M')
+            
+        print(available_times)
+        available_times = json.dumps(available_times)
+        print(available_times)
+        times=available_times
+        return HttpResponse(times)

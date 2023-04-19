@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone 
 import datetime
-
+from phonenumber_field.modelfields import PhoneNumberField
 class Service(models.Model):
     name = models.CharField("Имя Услуги", max_length=255,)
     price = models.FloatField("Цена" )
@@ -72,7 +72,7 @@ class Gender(models.Model):
 
 class CustomUser(User):
     phone_number = models.CharField("Номер телефона", max_length=16, null=False, blank=False)
-
+    # phone_number = PhoneNumberField("Номер телефона", null=False, blank=False)
     age = models.DateField("Дата рождения", null=False, blank=False)
 
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)

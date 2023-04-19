@@ -1,10 +1,12 @@
 
+import json
+from time import strptime
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import resolve_url
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView
 from django.http import JsonResponse, HttpResponse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
@@ -28,11 +30,16 @@ from .models import Order, TypesOfServices, Status
 from .models import *
 from .forms import *
 from main.decorators import unauthenticated_user, allowed_users
+# from time import strftime as s
 import datetime
+
 import pytz
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 def context(title, form):
     return({"title": title, "form": form})
 
@@ -142,6 +149,7 @@ class CustomLogoutView(LogoutView):
 class OrderFormAPIView(CreateAPIView):
     def post(self, request):
         # extract the values from the request data
+        print(request.POST)
         customer_id = request.user.customuser.id
         type_of_service_id = request.data.get("type_of_service")
         times_pick_str = request.data.get('times_pick')
@@ -149,7 +157,7 @@ class OrderFormAPIView(CreateAPIView):
         # convert the `times_pick` value to a `datetime` object with the correct timezone
         timezone_str = 'Asia/Almaty'  # set to the appropriate timezone
         timezonew = pytz.timezone(timezone_str)
-        times_pick = datetime.strptime(times_pick_str, '%d.%m.%Y %H:%M:%S')
+        times_pick = strptime(times_pick_str, '%d.%m.%Y %H:%M:%S')
         times_pick = timezonew.localize(times_pick)
         
         # get the current time in the UTC timezone
@@ -174,10 +182,15 @@ class BookingAPIView(CreateAPIView):
     def post(self, request):
         # extract the values from the request data
         customer_id = request.user.customuser.id
-        date_id= request.data.get("date")
+        date_str = request.data.get("date")
+        date_obj = datetime.datetime.strptime(date_str, '%d.%m.%Y')
+        date_id = date_obj.strftime('%Y-%m-%d')
+        
+        # date_id= request.data.get("date")
         time_id= request.data.get("time")
-        barber_id = request.data.get("barber")
-        service_id = request.data.get("service")
+        barber_id= Barber.objects.get(name=request.data.get("barber")).user_id
+        # barber_id = request.data.get("barber")
+        service_id = TypesOfServices.objects.get(name=request.data.get("type_of_service")).id
         Booking.objects.create(
             customer_id=customer_id,
             date = date_id,
@@ -186,6 +199,9 @@ class BookingAPIView(CreateAPIView):
             service_id = service_id,
         )
         return Response({'status': 'success', 'message': 'Order created successfully!'})
+
+
+
 class CustomRegistrationAPIView(CreateAPIView):
     model = CustomUser
 
@@ -212,18 +228,223 @@ class CustomRegistrationAPIView(CreateAPIView):
         return render(request, "main/registration_success.html")
 
 
-@login_required
-def profile(request):
-    if request.method == 'POST':
-        form = CustomUserForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile was updated successfully!')
-    else:
-        form = CustomUserForm(instance=request.user)
-    
-    return render(request, 'main/profile.html', {'form': form})
 
+# @login_required
+# def profile(request):
+#     user = get_object_or_404(CustomUser, pk=request.user.customuser.pk)
+#     if request.method == 'POST':
+#         # Update user's information based on the POST data
+#         user.first_name = request.POST.get('first_name', user.first_name)
+#         user.last_name = request.POST.get('last_name', user.last_name)
+#         user.email = request.POST.get('email', user.email)
+#         user.phone_number = request.POST.get('phone_number', user.phone_number)
+#         user.save()
+#         message = 'Profile updated successfully!'
+#     else:
+#         message = ''
+
+#     context = {
+#         'user': user,
+#         'message': message,
+#     }
+#     return render(request, 'main/profile.html', context)
+
+@login_required
+# def profile(request):
+#     user = get_object_or_404(CustomUser, pk=request.user.customuser.pk)
+
+#     if request.method == 'POST':
+#         # Check if the new password and confirm password match
+#         new_password = request.POST.get('new_password1', '').strip()
+#         confirm_password = request.POST.get('new_password2', '').strip()
+
+#         if new_password and confirm_password and new_password == confirm_password:
+#             # Set the user's new password
+#             user.set_password(new_password)
+#             user.save()
+#             messages.success(request, 'Password updated successfully!')
+#             return redirect('profile')
+
+#         # Update user's information based on the POST data
+#         user.first_name = request.POST.get('first_name', user.first_name)
+#         user.last_name = request.POST.get('last_name', user.last_name)
+
+#         email = request.POST.get('email', '').strip()
+#         if not email:
+#             messages.error(request, 'Email field cannot be empty!')
+#             return redirect('profile')
+#         user.email = email
+
+#         phone_number = request.POST.get('phone_number', '').strip()
+#         if CustomUser.objects.filter(phone_number=phone_number).exclude(pk=user.pk).exists():
+#             messages.error(request, 'Number already exists in the database!')
+#             return redirect('profile')
+#         user.phone_number = phone_number
+
+#         user.save()
+#         messages.success(request, 'Profile updated successfully!')
+
+#     context = {
+#         'user': user,
+#         'messages': messages,
+#     }
+#     return render(request, 'main/profile.html', context)
+def profile(request):
+    user = get_object_or_404(CustomUser, pk=request.user.customuser.pk)
+    # print(request.POST)
+    if request.method == 'POST':
+        # Update user's information based on the POST data
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        current_password = request.POST.get('current_password', '').strip()
+        if current_password:
+    # Check if the current password matches the user's password in the database
+            if user.check_password(current_password):
+                # Get the new password and confirm password from the POST data
+                new_password = request.POST.get('new_password1', '').strip()
+                confirm_password = request.POST.get('new_password2', '').strip()
+
+                # Check if the new password and confirm password match
+                if new_password and confirm_password and new_password == confirm_password:
+                    # Set the user's new password
+                    user.set_password(new_password)
+                    # Log the user out and redirect to the login page
+                    user.save()
+                    return redirect('logout')
+                else:
+                    messag = 'New password and confirm password fields must match!'
+                    messages = ""
+                    context = {
+                        'user': user,
+                        'messag': messag,
+                        'messages':messages,
+                    }
+                    return render(request, 'main/profile.html', context)
+            else:
+                messag = 'Current password is incorrect!'
+                messages = ""
+                context = {
+                    'user': user,
+                    'messag': messag,
+                    'messages':messages,
+                }
+                return render(request, 'main/profile.html', context) 
+        email = request.POST.get('email', '').strip()  # Get the email from the POST data
+        if not email:  # If email is empty, return an error message
+            message = 'Email field cannot be empty!'
+            messages = ""
+            context = {
+                'user': user,
+                'message': message,
+                'messages':messages,
+            }
+            return render(request, 'main/profile.html', context)
+
+        # Check if the email already exists in the database
+        if CustomUser.objects.filter(email=email).exclude(pk=user.pk).exists():
+            message = 'Email already exists in the database!'
+            messages = ""
+            context = {
+                'user': user,
+                'message': message,
+                'messages':messages,
+            }
+            return render(request, 'main/profile.html', context)
+
+        # Update the user's email if it passes the validation
+        user.email = email
+        
+        phone_number = request.POST.get('phone_number', '').strip()  # Get the phone number from the POST data
+        if CustomUser.objects.filter(phone_number=phone_number).exclude(pk=user.pk).exists():
+            message = 'Number already exists in the database!'
+            messages = ""
+            context = {
+                'user': user,
+                'message': message,
+                'messages':messages,
+            }
+            return render(request, 'main/profile.html', context)
+        if len(phone_number)<16:  # If phone number is empty, return an error message
+            message = 'Phone number to shost'
+            messages = ""
+            context = {
+                'user': user,
+                'message': message,
+                'messages':messages,
+            }
+            return render(request, 'main/profile.html', context)
+        if not phone_number:  # If phone number is empty, return an error message
+            message = 'Phone number field cannot be empty!'
+            messages = ""
+            context = {
+                'user': user,
+                'message': message,
+                'messages':messages,
+            }
+            return render(request, 'main/profile.html', context)
+
+        user.phone_number = phone_number  # Update the user's phone number
+        # current_password = request.POST.get('current_password', '').strip()
+        print(current_password)
+    #     if current_password:
+    # # Check if the current password matches the user's password in the database
+    #         if user.check_password(current_password):
+    #             # Get the new password and confirm password from the POST data
+    #             new_password = request.POST.get('new_password1', '').strip()
+    #             confirm_password = request.POST.get('new_password2', '').strip()
+
+    #             # Check if the new password and confirm password match
+    #             if new_password and confirm_password and new_password == confirm_password:
+    #                 # Set the user's new password
+    #                 user.set_password(new_password)
+    #                 # Log the user out and redirect to the login page
+    #                 user.save()
+    #                 return redirect('logout')
+    #             else:
+    #                 message = 'New password and confirm password fields must match!'
+    #                 context = {
+    #                     'user': user,
+    #                     'message': message,
+    #                 }
+    #                 return render(request, 'main/profile.html', context)
+    #         else:
+    #             message = 'Current password is incorrect!'
+    #             context = {
+    #                 'user': user,
+    #                 'message': message,
+    #             }
+    #             return render(request, 'main/profile.html', context)
+
+        user.save()  # Save the updated user object
+        messages = 'Profile updated successfully!'
+        message = ""
+    else:
+        message = ''
+        messages = ''
+    
+
+    context = {
+        'user': user,
+        'messages':messages
+    }
+    return render(request, 'main/profile.html', context)
+def userprofile(request):
+    user = get_object_or_404(CustomUser, pk=request.user.customuser.pk)
+    context = {
+                        'user': user,
+                        # 'message': message,
+                    }
+    return render(request, 'main/userprofile.html', context)
+
+
+def check_phone_number(request):
+    if request.method == "GET":
+        phone_number = request.GET.get("phone_number")
+        check = CustomUser.objects.filter(phone_number=phone_number).exists()
+        if check:
+            return HttpResponse("Exists")
+        else:
+            return HttpResponse("Not Exists")
 
 class CustomRegistrationView(CreateView):
     
@@ -264,6 +485,67 @@ class CustomRegistrationView(CreateView):
 
         return render(request, "main/registration_success.html")
     
+
+
+# class ProfileUpdateView(View):
+#     template_name = 'main/update_profile.html'
+
+#     def get(self, request):
+#         user = get_object_or_404(CustomUser, pk=request.user.customuser.pk)
+#         context = {
+#             'user': user,
+#             'phone_number': user.phone_number,
+#         }
+#         return render(request, self.template_name, context)
+
+#     def post(self, request):
+#         user = request.user
+
+#         # Update user's data
+#         if request.POST.get('username'):
+#             user.username = request.POST.get('username')
+#         if request.POST.get('email'):
+#             user.email = request.POST.get('email')
+#         if request.POST.get('phone_number'):
+#             user.phone_number = request.POST.get('phone_number')
+#         if request.POST.get('age'):
+#             user.age = request.POST.get('age')
+#         if request.POST.get('gender'):
+#             user.gender_id = request.POST.get('gender')
+#         user.save()
+
+#         messages.success(request, 'Profile updated successfully')
+#         return redirect('profile')
+   
+
+# class ProfileView(LoginRequiredMixin, View):
+#     """
+#     View to display and update user's own profile information.
+#     """
+#     template_name = 'profile.html'
+
+#     def get(self, request):
+#         user = request.customuser.user
+#         context = {
+#             'user': user,
+#         }
+#         return render(request, self.template_name, context)
+
+#     def post(self, request):
+#         user = request.customuser.user
+#         # Update user's information based on the POST data
+#         user.first_name = request.POST.get('first_name', user.first_name)
+#         user.last_name = request.POST.get('last_name', user.last_name)
+#         user.email = request.POST.get('email', user.email)
+#         user.phone_number = request.POST.get('phone_number', user.phone_number)
+#         user.save()
+#         context = {
+#             'user': user,
+#             'message': 'Profile updated successfully!',
+#         }
+#         return render(request, self.template_name, context)
+
+
 def get_users(request):
     print("ПРИШЛИ ДАННЫЕ С МОБИЛКИ")
     users = CustomUser.objects.all()
@@ -412,7 +694,14 @@ def check_user(request):
         else:
             return HttpResponse("Not Exists")
 
-
+def check_email(request):
+    if request.method == "GET":
+        email = request.GET["email"]
+        check = CustomUser.objects.filter(email=email)
+        if len(check) == 1:
+            return HttpResponse("exists")
+        else:
+            return HttpResponse("not exists")
 class CustomPasswordResetView(PasswordResetView):
     # email_template_name= "main/reset_pass/password_reset_email.html"
     # subject_template_name = "main/reset_pass/password_reset_email.txt"
@@ -558,7 +847,7 @@ def available_times(request):
             service = form.cleaned_data['service']
             barber = form.cleaned_data['barber']
             date = form.cleaned_data['date']
-            bookings = Booking.objects.filter(service=service, barber=barber, date=date).values_list('time', flat=True)
+            bookings = Booking.objects.filter(barber=barber, date=date).values_list('time', flat=True)
             available_times = []
             start_time = datetime.datetime.combine(date, datetime.time.min) + timedelta(hours=8.5)
             end_time = datetime.datetime.combine(date, datetime.time.min) + timedelta(hours=18)
@@ -578,7 +867,13 @@ def available_times(request):
             available_times.sort()
 
             del available_times[0]
-
+            print(available_times)
+            for i in range(len(available_times)):
+                available_times[i] = available_times[i].strftime('%H:%M:%S')
+            available_times = json.dumps(available_times)    
+            print(available_times)
+            available_times = json.loads(available_times)
+            print(available_times)
             context = {
                 'service': service,
                 'barber': barber,

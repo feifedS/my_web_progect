@@ -27,20 +27,23 @@ urlpatterns = [
     path("administration", views.administration, name="administration"),
     path("dashboard", views.dashboard, name="dashboard"),
     path("customer/<str:user_ptr_id>/",views.customer, name='customer'),
-    path("order_form", views.order_form, name="order_form"),
+    # path("order_form", views.ProfileView.as_view(), name="order_form"),
     path('profile', views.profile, name='profile'),
     path("update_form/<str:pk>", views.updateOrder, name="update_order"),
     path("delete_form/<str:pk>", views.deleteOrder, name="delete_order"),
     path('checkusername', views.check_username, name='check_username'),
     path("check_user",views.check_user,name="check_user"),
+    path("check_email", views.check_email, name="check_email"),
+path("check_phone_number", views.check_phone_number, name="check_phone_number"),
+
     path('book_appointment', views.available_times, name='book_appointment'),
    path('book_appointment/<int:service_id>/<int:barber_id>/<str:date>/<str:time>', views.book, name='book'),
     path('booking_success/<int:booking_id>', views.booking_success, name='booking_success'),
     path('booking_error', views.booking_error, name='booking_error'),
  path('api/models', ModelApiList.as_view(), name='appointment_confirmation'),
  path('api/aviable_times', AvailableTimesAjax.as_view(), name='aviable_times_ajax'),
- 
  path('api/barbers', BarberApiList.as_view(), name='barber_api'),
+ path('profile/user/', views.userprofile, name='profile_user'),
     #  path('fl', views.AppointmentFormView.as_view(), name='appointment_form'),
     # path('time_slots/<int:barber_id>/<str:appointment_date>/', views.appointment_time_slots, name='appointment_time_slots'),
     # path('appointments/', views.appointments_list, name='appointments_list'),
@@ -65,6 +68,6 @@ urlpatterns = [
     path('api/booking', BookingApiList.as_view(), name='api_booking'),
     path('api/barbergget', BarberApiListGET.as_view(), name='api_bbarbergget'),
     path('api/bookingpost', views.BookingAPIView.as_view(), name='api_booking_post'),
-
+    path('api/times',SendTimesAPI.as_view(),name='api_times')
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
